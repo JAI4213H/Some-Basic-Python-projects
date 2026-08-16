@@ -5,9 +5,33 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 submittedcolumns = []
+data_location = None
+df = None
 
-data = pd.read_csv("house_prediction_dataset.csv")
-df = pd.DataFrame(data=data)
+if data_location == None:
+    def temp_submissions():
+        global data_location,df
+        data_location = data_loc.get()
+        
+        try: 
+            data = pd.read_csv(f"{data_location}")
+            df = pd.DataFrame(data=data)
+            temp_submission.destroy()
+        except FileNotFoundError:
+            
+            print("Your input of filename isnt correct")
+        
+    
+
+    temp_submission = tk.Tk()
+    tk.Label(temp_submission,text="Enter name of the dataset or its location").pack(padx=10,pady=2)
+
+    data_loc = tk.Entry(temp_submission)
+    data_loc.pack(side=tk.LEFT,padx=10,pady=3)
+    tk.Button(temp_submission,text="Submit",command=temp_submissions).pack()
+    temp_submission.mainloop()
+
+
 
 def submitstuff():
 

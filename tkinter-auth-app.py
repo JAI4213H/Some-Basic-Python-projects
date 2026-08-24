@@ -3,18 +3,19 @@ import tkinter as tk
 from tkinter import ttk
 
 
-connect = sql.connect(host = "localhost",username="root",password='',database="world")
+connect = sql.connect(host = "localhost",username="root",password='',database="world") #Used Xampp for SQL server
 cursor = connect.cursor()
+#QURIES Required ----------------------------
 query = "INSERT INTO userdata (username,password) VALUES (%s,%s)"
 check_query = "SELECT username FROM userdata WHERE username = %s"
 login_query = "SELECT username FROM userdata WHERE username = %s AND password = %s"
-
+#----------------------------------
 option_window = tk.Tk()
 option_window.geometry("400x180")
 option_window.columnconfigure(1,weight=1)
 
 
-
+#WINDOW FOR CREARING ACCOUNT
 def CreateAcountWindow():
     
     def sumbit():
@@ -22,7 +23,7 @@ def CreateAcountWindow():
         password = pass_entry.get()
         values = [username,password]
         cursor.execute(check_query,(username,))
-        check_result  = cursor.fetchone()
+        check_result  = cursor.fetchone() #Fetch One DataLine if found then it wont return NONE
         
         
         if check_result is not None:
@@ -36,7 +37,7 @@ def CreateAcountWindow():
             print("Somehting Went Wrong!!!",e)
 
         
-    option_window.withdraw()
+    option_window.withdraw() # To Not destroy the window (we cant use .destroy)
     create_window = tk.Toplevel(option_window)
     create_window.columnconfigure(0,weight=1)
     create_window.columnconfigure(1,weight=2)
@@ -59,7 +60,7 @@ def CreateAcountWindow():
     sumbit_butn.grid(row=3,column=1)
 
 
-
+#LOGIN WINDOW
 def LoginWindow():
     
     def login():

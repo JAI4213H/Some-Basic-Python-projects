@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from ollama import chat
 
+#FOR TESTING AND LEARNING PURPOSE ONLY!!!!
+
 def getresult():
     response = chat(
         model='gemma2:2b',
@@ -39,7 +41,12 @@ entry_lable = tk.Label(root,text=f"You entered: Nothing till now ")
 
 
 entry_lable.pack()
+
+
 root.mainloop()
 
+#THINGS I MADE WRONG : 1. Used lable to display the output.  2. must have used Text or Scrollable Text
+# 3. SHould have used Grid instead of putting things randomly
+# 4. NO output optimizaion for the ollame gemma2:2b model.
 
 

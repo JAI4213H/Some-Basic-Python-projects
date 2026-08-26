@@ -103,27 +103,81 @@ while True:
         thread.start()
 
 
-    # Main program continues immediately
+    # mai n program continues immediately
     prompt = input("\nEnter Your Prompt: ")
 
     memory.append({
         "role": "user",
-        "content": prompt})
+        "content": prompt
+    })
 
 
     output = chat(
         model="qwen3:1.7b",
         messages=memory,
         think=True,
-        stream=True)
+        stream=True,
+        tools=[show_memory,]
+    )
+
 
     full_response = ""
+    tool_calls = []
+
     for i in output:
-        token = i.message.content
-        print(token, end="", flush=True)
-        full_response += token
+
+        if i.message.content:
+            token = i.message.content
+            print(token, end="", flush=True)
+            full_response += token
+
+        if i.message.tool_calls:
+            tool_calls.extend(i.message.tool_calls)
 
     print()
+
+
+    # Handle tool calls
+    if tool_calls:
+
+        memory.append({
+            "role": "assistant",
+            "tool_calls": tool_calls
+        })
+
+
+        for tool_call in tool_calls:
+
+            if tool_call.function.name == "show_memory":
+
+                result = show_memory()
+
+                memory.append({
+                    "role": "tool",
+                    "content": result
+                })
+
+
+        # Send tool result back to the model
+        output = chat(
+            model="qwen3:1.7b",
+            messages=memory,
+            think=True,
+            stream=True,
+            tools=[show_memory,]
+        )
+
+
+        full_response = ""
+
+        for i in output:
+
+            if i.message.content:
+                token = i.message.content
+                print(token, end="", flush=True)
+                full_response += token
+
+        print()
 
 
     memory.append({

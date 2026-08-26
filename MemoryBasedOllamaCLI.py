@@ -1,5 +1,8 @@
+import threading
 from ollama import chat
-##FUNCTION TO SUMMARISE THE MEMORY AFTER n AMOUNT OF CHAT
+
+
+
 
 the_real_content= """
 Summarise the following conversation memory carefully and create a compact but information-rich summary that can be used by the model in future conversations.
@@ -32,52 +35,84 @@ Here is the memory that needs to be summarized:
 
 
 
+counter = 0
+memory = []
 
+summarising = False
 
-def summarise_memory(x: list):
-    memory_content = "  ".join([i["content"] for i in x])
+##PROVIDE SNAPSHOT TO IT SO THAT IT WONT TAKE VALUE FROM CURRENT MEMORY AND WHICH MIGHT AFFECT SUMMARISING
+def summarise_memory(memory_snapshot):
+    memory_content = "  ".join(
+        i["content"] for i in memory_snapshot
+    )
+
     messages_format = [{
-        
-        
-        "role" : "user",
-        
-        "content": f"{the_real_content},{memory_content}"
+        "role": "user",
+        "content": f"{the_real_content}\n\n{memory_content}"
     }]
 
     summarised_memory = chat(
         model="qwen3:1.7b",
-        messages = messages_format,
-        think = False
+        messages=messages_format,
+        think=False
     )
+
     return summarised_memory.message.content
-    
 
-#WHILE LOOP TO GET PROMPTS FROM USERS AND STORING IN MEMORY SO THAT IT CAN BE USED AS REFRENCE
-counter = 0
-memory = []
 
-while True:
-    if counter > 2:
-        counter = 0
-        print("\n\nTrying To Summarise Memory\n\n")
+def background_summarise(memory_snapshot):
+    global memory
+    global summarising
 
-        temp = summarise_memory(memory)
+    print("\n\n[Background] Summarising memory...\n")
 
+    try:
+        summary = summarise_memory(memory_snapshot)
+
+        # Update memory after summarisation finishes
         memory.clear()
+
         memory.append({
             "role": "system",
-            "content": f"Memory of whole chat is: {temp}"
+            "content": f"Memory of whole chat is: {summary}"
         })
 
-        print("Memory Updated")
-        print("\n", memory[0]["content"])
+        print("\n[Background] Memory Updated!\n")
 
-    prompt = str(input("Enter Your Prompt: "))
+    except Exception as e:
+        print("\n[Background] Error:", e)
+
+    finally:
+        summarising = False
+
+
+while True:
+
+    # Start background summarisation
+    if counter > 2 and not summarising:
+
+        counter = 0
+        summarising = True
+
+        # Give the thread a copy, not the actual memory
+        memory_snapshot = memory.copy()
+
+        thread = threading.Thread(
+            target=background_summarise,
+            args=(memory_snapshot,)
+        )
+
+        thread.start()
+
+
+    # Main program continues immediately
+    prompt = input("\nEnter Your Prompt: ")
 
     memory.append({
         "role": "user",
         "content": prompt
     })
+
 
     output = chat(
         model="qwen3:1.7b",
@@ -85,23 +120,24 @@ while True:
         think=True,
         stream=True
     )
+
+
     full_response = ""
 
     for i in output:
         token = i.message.content
+
         print(token, end="", flush=True)
+
         full_response += token
+
     print()
-    
+
+
     memory.append({
         "role": "assistant",
         "content": full_response
     })
 
+
     counter += 1
-    
-    
-    
-    
-    
-    

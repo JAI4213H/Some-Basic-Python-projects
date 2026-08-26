@@ -43,13 +43,11 @@ summarising = False
 ##PROVIDE SNAPSHOT TO IT SO THAT IT WONT TAKE VALUE FROM CURRENT MEMORY AND WHICH MIGHT AFFECT SUMMARISING
 def summarise_memory(memory_snapshot):
     memory_content = "  ".join(
-        i["content"] for i in memory_snapshot
-    )
+        i["content"] for i in memory_snapshot)
 
     messages_format = [{
         "role": "user",
-        "content": f"{the_real_content}\n\n{memory_content}"
-    }]
+        "content": f"{the_real_content}\n\n{memory_content}"}]
 
     summarised_memory = chat(
         model="qwen3:1.7b",
@@ -110,25 +108,19 @@ while True:
 
     memory.append({
         "role": "user",
-        "content": prompt
-    })
+        "content": prompt})
 
 
     output = chat(
         model="qwen3:1.7b",
         messages=memory,
         think=True,
-        stream=True
-    )
-
+        stream=True)
 
     full_response = ""
-
     for i in output:
         token = i.message.content
-
         print(token, end="", flush=True)
-
         full_response += token
 
     print()

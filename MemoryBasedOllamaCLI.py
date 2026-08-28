@@ -4,6 +4,11 @@ from ollama import chat
 
 
 
+counter = 0
+memory = []
+
+summarising = False
+
 the_real_content= """
 Summarise the following conversation memory carefully and create a compact but information-rich summary that can be used by the model in future conversations.
 
@@ -35,19 +40,20 @@ Here is the memory that needs to be summarized:
 
 
 
-counter = 0
-memory = []
 
-summarising = False
 
+
+##GIVE SNAPSHOT OF THE MEMORY SO THAT IT WONT INTERFARE IN NEW MEMORY CREATED USING CHAT IN PARALLEL
 ##PROVIDE SNAPSHOT TO IT SO THAT IT WONT TAKE VALUE FROM CURRENT MEMORY AND WHICH MIGHT AFFECT SUMMARISING
 def summarise_memory(memory_snapshot):
     memory_content = "  ".join(
-        i["content"] for i in memory_snapshot)
+        i["content"] for i in memory_snapshot
+    )
 
     messages_format = [{
         "role": "user",
-        "content": f"{the_real_content}\n\n{memory_content}"}]
+        "content": f"{the_real_content}\n\n{memory_content}"
+    }]
 
     summarised_memory = chat(
         model="qwen3:1.7b",
@@ -57,6 +63,11 @@ def summarise_memory(memory_snapshot):
 
     return summarised_memory.message.content
 
+
+def show_memory():
+    """Used to show/display the stored memory"""
+    global memory
+    return memory[0]["content"]
 
 def background_summarise(memory_snapshot):
     global memory
@@ -82,7 +93,6 @@ def background_summarise(memory_snapshot):
 
     finally:
         summarising = False
-
 
 while True:
 

@@ -29,6 +29,7 @@ dimension = None #To store the dimention of the Matrtix
 def next_step():  #Function to make a group of entries which will mimic matrix elements
     global total
     nxt = tk.Tk()
+    
     matrix_frame = ttk.Frame(nxt)
     matrix_frame.pack()
     
@@ -50,7 +51,6 @@ def next_step():  #Function to make a group of entries which will mimic matrix e
         
     
     
-    
 ###FIRST INTERFACE -- JUST A BASIC INTERFACE NO FURTHER DEVELOPMENT NEEDED HERE!!!!!!!!!!!!!!!!!!!!!!###############   
 root = tk.Tk()  #First Interface
 root.geometry("300x180")
@@ -59,9 +59,10 @@ def root_submit():
     global dimension
     try:
         dimension = int(entry.get())
-        sucesslabel = ttk.Label(root,text="Proceding to Next step in 2 seconds",foreground="green")
+        sucesslabel = ttk.Label(root,text="Proceding to Next step in 20 miniseconds",foreground="green")
         sucesslabel.pack(padx=5,pady=1)
-        root.after(2000,next_step)
+        root.after(200,next_step)
+        
         
     except:
         warninglabel = ttk.Label(root,text="Enter an Integer please!!",foreground="red")
@@ -72,6 +73,6 @@ label1 = tk.Label(root,text="Dimension Of square matrix")
 label1.pack(padx=5,pady=1)
 entry = ttk.Entry(root)
 entry.pack(padx=5,pady=2,ipadx=20)
-button = ttk.Button(root,command=root_submit)
+button = ttk.Button(root,command=root_submit,text="SUBMIT")
 button.pack(padx=5,pady=2,ipadx=20)
 root.mainloop()

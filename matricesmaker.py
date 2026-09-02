@@ -1,24 +1,49 @@
 import tkinter as tk
 from tkinter import ttk
 import time
-import numpy
+import numpy as np
+
+total = [] 
 
 
+values = [] ## All the values of the matrix will be stored in this 2D array
 
-dimension = None
-def next_step():
+def getvalues(nxt): # TO get the values of elements which we entered in element BOX
+    global values #To store the values in it
+    try:
+        values = []
+        
+        for i in total:
+            row_value = []  ##To get row values which later will be stored in values
+            for j in i:
+                row_value.append(int(j.get()))
+            values.append(row_value)
+        print(np.array(values))
+    except:
+        a = ttk.Label(nxt,foreground="red",text="Something Went wrong")
+        a.pack()
+                
+
+dimension = None #To store the dimention of the Matrtix
+
+def next_step():  #Function to make a group of entries which will mimic matrix elements
+    global total
     nxt = tk.Tk()
+    matrix_frame = ttk.Frame(nxt)
+    matrix_frame.pack()
     
     total=[]
     for i in range(dimension):
         row=[]
         for j in range(dimension):
             
-            element = ttk.Entry(nxt,width=3,font=("Arial", 14),justify="center")
+            element = tk.Entry(matrix_frame,width=3,font=("Arial", 14),justify="center",bg="black",fg='white')
             element.grid(row=i,column=j,ipadx=10,ipady=10,padx=2,pady=2)
             row.append(element)
         total.append(row)
-        print(total)
+        
+    sumbit_button = ttk.Button(nxt,text="Submit to perform Operations",command=lambda: getvalues(nxt=nxt))
+    sumbit_button.pack(ipadx=20,ipady=5)
             
             
     nxt.mainloop()
@@ -26,8 +51,8 @@ def next_step():
     
     
     
-    
-root = tk.Tk()
+###FIRST INTERFACE -- JUST A BASIC INTERFACE NO FURTHER DEVELOPMENT NEEDED HERE!!!!!!!!!!!!!!!!!!!!!!###############   
+root = tk.Tk()  #First Interface
 root.geometry("300x180")
 
 def root_submit():

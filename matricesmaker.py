@@ -8,10 +8,25 @@ import numpy
 dimension = None
 def next_step():
     nxt = tk.Tk()
+    
+    total=[]
     for i in range(dimension):
+        row=[]
         for j in range(dimension):
             
-    pass
+            element = ttk.Entry(nxt,width=3,font=("Arial", 14),justify="center")
+            element.grid(row=i,column=j,ipadx=10,ipady=10,padx=2,pady=2)
+            row.append(element)
+        total.append(row)
+        print(total)
+            
+            
+    nxt.mainloop()
+        
+    
+    
+    
+    
 root = tk.Tk()
 root.geometry("300x180")
 

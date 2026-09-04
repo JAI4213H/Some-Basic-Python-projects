@@ -4,9 +4,30 @@ import time
 import numpy as np
 
 total = [] 
-
-
 values = [] ## All the values of the matrix will be stored in this 2D array
+def matrix_info():
+    global values
+    arr = np.array(values)
+    det = np.linalg.det(arr)
+    rank = np.linalg.matrix_rank(arr)
+    mean = np.mean(arr)
+    eigen_values,eigen_vectors = np.linalg.eig(arr)
+    info_values = {
+        "det": det,
+        "rank": rank,
+        "mean": mean,
+        "eigen_values": eigen_values,
+        "eigen_vectors": eigen_vectors
+    }
+    info = tk.Tk()
+    info.geometry("400x300")
+    for i in info_values:
+        a = ttk.Label(info,text=f"{i} : {info_values[i]}")
+        a.pack(padx=10,pady=3)
+    info.mainloop()
+   
+
+
 
 def getvalues(nxt): # TO get the values of elements which we entered in element BOX
     global values #To store the values in it
@@ -18,6 +39,7 @@ def getvalues(nxt): # TO get the values of elements which we entered in element 
             for j in i:
                 row_value.append(int(j.get()))
             values.append(row_value)
+        
         print(np.array(values))
     except:
         a = ttk.Label(nxt,foreground="red",text="Something Went wrong")
@@ -42,8 +64,12 @@ def next_step():  #Function to make a group of entries which will mimic matrix e
             element.grid(row=i,column=j,ipadx=10,ipady=10,padx=2,pady=2)
             row.append(element)
         total.append(row)
+    def submit_functions(nxt):
+        getvalues(nxt)
+        matrix_info()
         
-    sumbit_button = ttk.Button(nxt,text="Submit to perform Operations",command=lambda: getvalues(nxt=nxt))
+        
+    sumbit_button = ttk.Button(nxt,text="Submit to perform Operations",command=lambda: submit_functions(nxt=nxt))
     sumbit_button.pack(ipadx=20,ipady=5)
             
             

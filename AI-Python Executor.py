@@ -28,8 +28,14 @@ elif a.startswith('"""') and a.endswith('"""'):
 elif a.startswith('```') and a.endswith('```'):
     a = a[3:-3].strip()
 
-
-
 namespace = {}
-exec(a,namespace)
-print("all the functions and calls are", namespace.keys())
+try: 
+  exec(a,namespace)
+  print("all the functions and calls are", namespace.keys())
+except: 
+  exec(a)
+  print("Code Executed SUcessfully")
+  
+
+
+

@@ -1,45 +1,77 @@
+
 from openai import OpenAI
-
-client = OpenAI(
-  base_url = "https://integrate.api.nvidia.com/v1",
-  api_key = "HEll_NAH"
-)
-prompt = str(input("Enter the prompt"))
-try: ##Error handeling (if user didnt put the key )
-  response = client.responses.create(
-    model="openai/gpt-oss-20b",
-    input=rf"{prompt} and dont add text like heres the python code, like only give to code no other nstruction. MAKE SURE NOT TO INCLUDE ``` python OR #!/usr/bin/env python3 just the code in tripple quatations",
-    max_output_tokens=4096,
-    top_p=1,
-    temperature=1,
-    stream=False,
-    reasoning={"effort": "low"}
-  )
-except:
-  print("for API keys go to: https://build.nvidia.com/settings/api-keys")
-  
-a = response.output_text.strip() ##BAsic processing of the output the agent gave
-if a.startswith("'''") and a.endswith("'''"):
-    a = a[3:-3].strip()
-  
-elif a.startswith('"""') and a.endswith('"""'):
-    a = a[3:-3].strip()
-elif a.startswith('```') and a.endswith('```'):
-    a = a[3:-3].strip()
-    
-namespace = {}
-
-try:
-    exec(a, namespace)
-
-    namespace.pop("__builtins__", None)  #to remove the default function python returns when we use exec
-
-    print("Functions and variables:", namespace.keys())
-
-except Exception as e:
-    print("Code execution failed:", e)
+import inspect
 
 
-for i,j in namespace.items():
-  globals()[i] = j     #Used to store variables in their respected name variables and will be available in global codespace
-  
+class ModelSet:
+    def __init__(self, api_key, model="openai/gpt-oss-20b"):
+        self.api_key = api_key
+        self.model = model
+        self.namespace = {}
+
+    def connect(self, prompt):
+        client = OpenAI(
+            base_url="https://integrate.api.nvidia.com/v1",
+            api_key=self.api_key
+        )
+
+        try:
+            response = client.responses.create(
+                model=self.model,
+                input=(
+                    f"{prompt}\n\n"
+                    "Return only Python code. Do not include explanations "
+                    "or Markdown code fences."
+                ),
+                max_output_tokens=4096,
+                top_p=1,
+                temperature=1,
+                reasoning={"effort": "low"}
+            )
+            return response.output_text.strip()
+
+        except Exception as e:
+            print("API error:", e)
+            print("Check your API key:",
+                  "https://build.nvidia.com/settings/api-keys")
+            return None
+
+    def process(self, code):
+        if not code:
+            print("No code received.")
+            return
+
+        code = code.strip()
+
+        if code.startswith("```") and code.endswith("```"):
+            lines = code.splitlines()
+            code = "\n".join(lines[1:-1]).strip()
+        elif (
+            (code.startswith("'''") and code.endswith("'''"))
+            or (code.startswith('"""') and code.endswith('"""'))
+        ):
+            code = code[3:-3].strip()
+
+        namespace = {}
+
+        try:
+            exec(code, namespace)
+
+            self.namespace = {
+                name: obj
+                for name, obj in namespace.items()
+                if name != "__builtins__"
+            }
+
+            print("Functions and variables:",
+                  list(self.namespace.keys()))
+
+        except Exception as e:
+            print("Code execution failed:", e)
+
+    def show_functions(self):
+        print("Available functions:")
+
+        for name, obj in self.namespace.items():
+            if inspect.isfunction(obj):
+                print(name)
